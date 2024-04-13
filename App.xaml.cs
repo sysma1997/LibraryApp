@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -13,5 +14,15 @@ namespace Library
     /// </summary>
     public partial class App : Application
     {
+        public App()
+        {
+            migrateDatabase();
+        }
+
+        public async void migrateDatabase()
+        {
+            Models.DatabaseContext db = new Models.DatabaseContext();
+            await db.Database.MigrateAsync();
+        }
     }
 }

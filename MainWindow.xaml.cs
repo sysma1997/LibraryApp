@@ -16,36 +16,35 @@ using System.Windows.Shapes;
 
 namespace Library
 {
+    enum MainWindowViews { BOOKS, CLIENTS, LOANS }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
         private readonly Models.DatabaseContext db = new Models.DatabaseContext();
-        private CollectionViewSource libraryViewSource;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            libraryViewSource = (CollectionViewSource)FindResource(nameof(libraryViewSource));
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void setView(MainWindowViews view)
         {
-            db.Database.EnsureCreated();
-            db.Libraries.Load();
-            libraryViewSource.Source = db.Libraries.Local.ToObservableCollection();
-        }
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            db.Dispose();
+            //
         }
 
-        private void btnSave(object sender, RoutedEventArgs e)
+        private void btnBooksShow(object sender, RoutedEventArgs e)
         {
-            db.SaveChanges();
-            dgLibrary.Items.Refresh();
+        }
+        private void btnClientsShow(object sender, RoutedEventArgs e)
+        {
+
+        }
+        private void btnLoansShow(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -28,13 +28,11 @@ namespace Library.Models
             builder.Entity<Client>().HasKey(cl => cl.id);
             builder.Entity<Loan>().ToTable("Loans");
             builder.Entity<Loan>().HasKey(lo => lo.id);
-            builder.Entity<Loan>()
-                .HasOne(lo => lo.Library)
+            builder.Entity<Loan>().HasOne(lo => lo.Library)
                 .WithMany(li => li.Loans)
                 .HasForeignKey(lo => lo.idLibrary)
                 .OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<Loan>()
-                .HasOne(lo => lo.Client)
+            builder.Entity<Loan>().HasOne(lo => lo.Client)
                 .WithMany(cl => cl.Loans)
                 .HasForeignKey(lo => lo.idClient)
                 .OnDelete(DeleteBehavior.Cascade);
