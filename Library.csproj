@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Resource Include="Assets\Images\BooksIcon.png" />
     <Resource Include="Assets\Images\ClientsIcon.png" />
     <Resource Include="Assets\Images\LibraryIcon.png" />
@@ -47,6 +43,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Windows\" />
   </ItemGroup>
 
 </Project>

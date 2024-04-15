@@ -21,6 +21,31 @@ namespace Library.Migrations
                 .HasAnnotation("Proxies:CheckEquality", false)
                 .HasAnnotation("Proxies:LazyLoading", true);
 
+            modelBuilder.Entity("Library.Models.Book", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("author")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("numPages")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("quantity")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Books", (string)null);
+                });
+
             modelBuilder.Entity("Library.Models.Client", b =>
                 {
                     b.Property<Guid>("id")
@@ -43,31 +68,6 @@ namespace Library.Migrations
                     b.ToTable("Clients", (string)null);
                 });
 
-            modelBuilder.Entity("Library.Models.Library", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("author")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("numPages")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("quantity")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("id");
-
-                    b.ToTable("Libraries", (string)null);
-                });
-
             modelBuilder.Entity("Library.Models.Loan", b =>
                 {
                     b.Property<Guid>("id")
@@ -80,46 +80,46 @@ namespace Library.Migrations
                     b.Property<DateTime>("deadline")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("idClient")
+                    b.Property<Guid>("idBook")
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("idLibrary")
+                    b.Property<Guid>("idClient")
                         .HasColumnType("TEXT");
 
                     b.HasKey("id");
 
-                    b.HasIndex("idClient");
+                    b.HasIndex("idBook");
 
-                    b.HasIndex("idLibrary");
+                    b.HasIndex("idClient");
 
                     b.ToTable("Loans", (string)null);
                 });
 
             modelBuilder.Entity("Library.Models.Loan", b =>
                 {
+                    b.HasOne("Library.Models.Book", "Book")
+                        .WithMany("Loans")
+                        .HasForeignKey("idBook")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Library.Models.Client", "Client")
                         .WithMany("Loans")
                         .HasForeignKey("idClient")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Library.Models.Library", "Library")
-                        .WithMany("Loans")
-                        .HasForeignKey("idLibrary")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Book");
 
                     b.Navigation("Client");
-
-                    b.Navigation("Library");
                 });
 
-            modelBuilder.Entity("Library.Models.Client", b =>
+            modelBuilder.Entity("Library.Models.Book", b =>
                 {
                     b.Navigation("Loans");
                 });
 
-            modelBuilder.Entity("Library.Models.Library", b =>
+            modelBuilder.Entity("Library.Models.Client", b =>
                 {
                     b.Navigation("Loans");
                 });
