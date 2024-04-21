@@ -130,6 +130,11 @@
             </Button>
         </StackPanel>
 
+        <Label x:Name="lblDefaultOption"
+               Foreground="Gray"
+               Grid.Column="1"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Center">Select option the menu.</Label>
         <Grid Grid.Column="1" x:Name="gDashboard" Margin="10"
               Visibility="Collapsed">
             <Grid.RowDefinitions>

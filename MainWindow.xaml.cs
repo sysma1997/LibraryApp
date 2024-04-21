@@ -35,6 +35,9 @@ namespace Library
         private void setView(MainWindowViews view)
         {
             this.view = view;
+            
+            if (lblDefaultOption.Visibility == Visibility.Visible)
+                lblDefaultOption.Visibility = Visibility.Collapsed;
             gDashboard.Visibility = Visibility.Visible;
 
             if (view == MainWindowViews.BOOKS)
@@ -51,7 +54,8 @@ namespace Library
                 lblSearch.Content = "Search Loans:";
             }
         }
-        private void loadBooks()
+        
+        public void loadBooks()
         {
             List<Models.Book> books = Core.Book.GetList.Init(db);
             dataGrid.Columns.Clear();
@@ -119,7 +123,7 @@ namespace Library
         {
             if (view == MainWindowViews.BOOKS)
             {
-                //
+                new Windows.AddBook(db, this).Show();
             }
         }
     }

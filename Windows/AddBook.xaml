@@ -1,0 +1,30 @@
+﻿<Window x:Class="Library.Windows.AddBook"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Library.Windows"
+        mc:Ignorable="d"
+        Title="Add book" Height="330" Width="400">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        
+        <StackPanel>
+            <Label>Name:</Label>
+            <TextBox x:Name="txtName" Margin="0,3,0,10" />
+            <Label>Author:</Label>
+            <TextBox x:Name="txtAuthor" Margin="0,3,0,10" />
+            <Label>Number the pages:</Label>
+            <TextBox x:Name="txtNumPages" Margin="0,3,0,10" 
+                     InputScope="Number" />
+            <Label>Quantity:</Label>
+            <TextBox x:Name="txtQuantity" Margin="0,3,0,10" 
+                     InputScope="Number" />
+            <Label x:Name="lblMessage" />
+        </StackPanel>
+        <Button Grid.Row="1" Click="btnAddClick">Add</Button>
+    </Grid>
+</Window>
