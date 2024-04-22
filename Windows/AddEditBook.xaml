@@ -1,4 +1,4 @@
-﻿<Window x:Class="Library.Windows.AddBook"
+﻿<Window x:Class="Library.Windows.AddEditBook"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -25,6 +25,8 @@
                      InputScope="Number" />
             <Label x:Name="lblMessage" />
         </StackPanel>
-        <Button Grid.Row="1" Click="btnAddClick">Add</Button>
+        <Button x:Name="btnAddEdit" 
+                Grid.Row="1" 
+                Click="btnAddClick">Add</Button>
     </Grid>
 </Window>

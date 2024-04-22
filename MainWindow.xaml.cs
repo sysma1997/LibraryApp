@@ -27,6 +27,10 @@ namespace Library
 
         private MainWindowViews view = MainWindowViews.BOOKS;
 
+        private List<Models.Book> books = null;
+        private List<Models.Client> clients = null;
+        private List<Models.Loan> loans = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -54,10 +58,30 @@ namespace Library
                 lblSearch.Content = "Search Loans:";
             }
         }
+        private void search()
+        {
+            if (txtSearch.Text == "")
+            {
+                if (view == MainWindowViews.BOOKS) loadBooks();
+
+                return;
+            }
+
+            if (view == MainWindowViews.BOOKS)
+            {
+                List<Models.Book> books = this.books.Where(b =>
+                    b.name.Contains(txtSearch.Text) ||
+                    b.author.Contains(txtSearch.Text)).ToList();
+                dataGrid.ItemsSource = books;
+            }
+        }
         
         public void loadBooks()
         {
-            List<Models.Book> books = Core.Book.GetList.Init(db);
+            clients = null;
+            loans = null;
+
+            books = Core.Book.GetList.Init(db);
             dataGrid.Columns.Clear();
             dataGrid.Columns.Add(new DataGridTextColumn()
             {
@@ -104,27 +128,55 @@ namespace Library
 
         private void tbEnterKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                if (view == MainWindowViews.BOOKS)
-                {
-                    //
-                }
-            }
+            if (e.Key == Key.Enter) search();
         }
         private void btnSearchClick(object sender, RoutedEventArgs e)
         {
+            search();
+        }
+        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (dataGrid.SelectedItem == null) return;
+
+            btnDelete.Visibility = Visibility.Visible;
+            btnEdit.Visibility = Visibility.Visible;
+        }
+        private void btnDeleteClick(object sender, RoutedEventArgs e)
+        {
+            Guid id = Guid.Empty;
+            string title = "";
+            string message = "";
+
             if (view == MainWindowViews.BOOKS)
             {
-                //
+                Models.Book book = dataGrid.SelectedItem as Models.Book;
+
+                id = book.id;
+                title = "Book";
+                message = $"¿Remove this book {book.name}?";
+            }
+
+            MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result != MessageBoxResult.Yes) return;
+
+            if (view == MainWindowViews.BOOKS)
+            {
+                Core.Book.Delete.Init(db, id);
+                loadBooks();
+            }
+        }
+        private void btnEditClick(object sender, RoutedEventArgs e)
+        {
+            if (view == MainWindowViews.BOOKS)
+            {
+                Models.Book book = dataGrid.SelectedItem as Models.Book;
+                new Windows.AddEditBook(db, this, book).Show();
             }
         }
         private void btnAddClick(object sender, RoutedEventArgs e)
         {
             if (view == MainWindowViews.BOOKS)
-            {
-                new Windows.AddBook(db, this).Show();
-            }
+                new Windows.AddEditBook(db, this).Show();
         }
     }
 }

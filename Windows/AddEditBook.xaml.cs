@@ -17,17 +17,31 @@ namespace Library.Windows
     /// <summary>
     /// Interaction logic for AddBookWindow.xaml
     /// </summary>
-    public partial class AddBook : Window
+    public partial class AddEditBook : Window
     {
         private Models.DatabaseContext db;
         private MainWindow mainWindow;
+        private Models.Book book;
 
-        public AddBook(Models.DatabaseContext db, MainWindow mainWindow)
+        public AddEditBook(Models.DatabaseContext db, 
+            MainWindow mainWindow, 
+            Models.Book book = null)
         {
             InitializeComponent();
 
             this.db = db;
             this.mainWindow = mainWindow;
+            this.book = book;
+
+            if (book != null)
+            {
+                txtName.Text = book.name;
+                txtAuthor.Text = book.author;
+                txtNumPages.Text = book.numPages.ToString();
+                txtQuantity.Text = book.quantity.ToString();
+
+                btnAddEdit.Content = "Edit";
+            }
         }
         private void setMessage(string message)
         {
@@ -87,7 +101,14 @@ namespace Library.Windows
             book.numPages = numPages;
             book.quantity = quantity;
             
-            Core.Book.Add.Init(db, book);
+            if (this.book == null)
+                Core.Book.Add.Init(db, book);
+            else
+            {
+                book.id = this.book.id;
+                Core.Book.Edit.Init(db, book);
+            }
+
             mainWindow.loadBooks();
             this.Close();
         }

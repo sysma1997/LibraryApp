@@ -7,7 +7,7 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Windows\AddBook.xaml.cs">
+    <Compile Update="Windows\AddEditBook.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -15,7 +15,7 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="Windows\AddBook.xaml">
+    <Page Update="Windows\AddEditBook.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
