@@ -52,6 +52,7 @@ namespace Library
             else if (view == MainWindowViews.CLIENTS)
             {
                 lblSearch.Content = "Search Clients:";
+                loadClients();
             }
             else
             {
@@ -63,16 +64,26 @@ namespace Library
             if (txtSearch.Text == "")
             {
                 if (view == MainWindowViews.BOOKS) loadBooks();
+                if (view == MainWindowViews.CLIENTS) loadClients();
 
                 return;
             }
 
+            string search = txtSearch.Text.ToUpper();
             if (view == MainWindowViews.BOOKS)
             {
                 List<Models.Book> books = this.books.Where(b =>
-                    b.name.Contains(txtSearch.Text) ||
-                    b.author.Contains(txtSearch.Text)).ToList();
+                    b.name.ToUpper().Contains(search) ||
+                    b.author.ToUpper().Contains(search)).ToList();
                 dataGrid.ItemsSource = books;
+            }
+            else if (view == MainWindowViews.CLIENTS)
+            {
+                List<Models.Client> clients = this.clients.Where(c =>
+                    c.cardNumber.ToString().Contains(search) ||
+                    c.name.ToUpper().Contains(search) ||
+                    c.phone.Contains(search)).ToList();
+                dataGrid.ItemsSource = clients;
             }
         }
         
@@ -111,6 +122,37 @@ namespace Library
                 Width = new DataGridLength(1, DataGridLengthUnitType.Star)
             });
             dataGrid.ItemsSource = books;
+        }
+        public void loadClients()
+        {
+            books = null;
+            loans = null;
+
+            clients = Core.Client.GetList.Init(db);
+            dataGrid.Columns.Clear();
+            dataGrid.Columns.Add(new DataGridTextColumn()
+            {
+                Header = "Id", 
+                Binding = new Binding("id"),
+                Visibility = Visibility.Collapsed
+            });
+            dataGrid.Columns.Add(new DataGridTextColumn()
+            {
+                Header = "Card phone", 
+                Binding = new Binding("cardNumber")
+            });
+            dataGrid.Columns.Add(new DataGridTextColumn()
+            {
+                Header = "Name",
+                Binding = new Binding("name")
+            });
+            dataGrid.Columns.Add(new DataGridTextColumn()
+            {
+                Header = "Phone", 
+                Binding = new Binding("phone"), 
+                Width = new DataGridLength(1, DataGridLengthUnitType.Star)
+            });
+            dataGrid.ItemsSource = clients;
         }
 
         private void btnBooksShow(object sender, RoutedEventArgs e)
@@ -153,7 +195,15 @@ namespace Library
 
                 id = book.id;
                 title = "Book";
-                message = $"¿Remove this book {book.name}?";
+                message = $"Remove this book {book.name}?";
+            }
+            else if (view == MainWindowViews.CLIENTS)
+            {
+                Models.Client client = dataGrid.SelectedItem as Models.Client;
+
+                id = client.id;
+                title = "Client";
+                message = $"Remove this client {client.name}?";
             }
 
             MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -164,6 +214,11 @@ namespace Library
                 Core.Book.Delete.Init(db, id);
                 loadBooks();
             }
+            else if (view == MainWindowViews.CLIENTS)
+            {
+                Core.Client.Delete.Init(db, id);
+                loadClients();
+            }
         }
         private void btnEditClick(object sender, RoutedEventArgs e)
         {
@@ -172,11 +227,18 @@ namespace Library
                 Models.Book book = dataGrid.SelectedItem as Models.Book;
                 new Windows.AddEditBook(db, this, book).Show();
             }
+            else if (view == MainWindowViews.CLIENTS)
+            {
+                Models.Client client = dataGrid.SelectedItem as Models.Client;
+                new Windows.AddEditClient(db, this, client).Show();
+            }
         }
         private void btnAddClick(object sender, RoutedEventArgs e)
         {
             if (view == MainWindowViews.BOOKS)
                 new Windows.AddEditBook(db, this).Show();
+            else if (view == MainWindowViews.CLIENTS)
+                new Windows.AddEditClient(db, this).Show();
         }
     }
 }

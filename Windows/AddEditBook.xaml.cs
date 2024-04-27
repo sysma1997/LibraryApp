@@ -43,6 +43,7 @@ namespace Library.Windows
                 btnAddEdit.Content = "Edit";
             }
         }
+
         private void setMessage(string message)
         {
             lblMessage.Foreground = Brushes.Red;
