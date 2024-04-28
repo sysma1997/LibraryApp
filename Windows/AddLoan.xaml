@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Library.Windows"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         Title="Add loan" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -19,15 +20,37 @@
         </Grid.ColumnDefinitions>
 
         <Label>Select the book:</Label>
-        <TextBox Grid.Row="1" 
-                 x:Name="txtBookFilter" Margin="5" />
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBox x:Name="txtBookFilter" 
+                     Margin="0,5,5,5" 
+                     KeyDown="txtBookFilterKeyDown" />
+            <Button Grid.Column="1" 
+                    Margin="5"
+                    Click="btnSearchBookClick">Search</Button>
+        </Grid>
         <DataGrid Grid.Row="2" x:Name="dgBooks" 
                   Margin="0,0,5,0" 
                   AutoGenerateColumns="False"
                   IsReadOnly="True" />
         <Label Grid.Column="1">Select the client:</Label>
-        <TextBox Grid.Row="1" Grid.Column="1"
-                 x:Name="txtClientFilter" Margin="5" />
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            
+            <TextBox x:Name="txtClientFilter" 
+                     Margin="5,5,0,5" 
+                     KeyDown="txtClientFilterKeyDown" />
+            <Button Grid.Column="1"
+                    Margin="5"
+                    Click="btnSearchClientClick">Search</Button>
+        </Grid>
         <DataGrid Grid.Row="2" Grid.Column="1" 
           x:Name="dgClients" Margin="5,0,0,0" 
                   AutoGenerateColumns="False"

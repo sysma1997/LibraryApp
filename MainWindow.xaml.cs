@@ -90,6 +90,13 @@ namespace Library
                     c.phone.Contains(search)).ToList();
                 dataGrid.ItemsSource = clients;
             }
+            else
+            {
+                List<Models.Loan> loans = this.loans.Where(l =>
+                    l.Book.name.ToUpper().Contains(search) ||
+                    l.Client.name.ToUpper().Contains(search)).ToList();
+                dataGrid.ItemsSource = loans;
+            }
         }
         
         public void loadBooks()

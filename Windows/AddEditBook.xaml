@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Library.Windows"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
         Title="Add book" Height="330" Width="400">
     <Grid Margin="10">
         <Grid.RowDefinitions>

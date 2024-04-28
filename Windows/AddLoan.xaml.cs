@@ -23,6 +23,8 @@ namespace Library.Windows
         private Models.DatabaseContext context;
         private MainWindow mainWindow;
 
+        private List<Models.Book> books;
+        private List<Models.Client> clients;
         private List<Models.Loan> loans;
 
         public AddLoan(Models.DatabaseContext context, MainWindow mainWindow)
@@ -32,8 +34,8 @@ namespace Library.Windows
             this.context = context;
             this.mainWindow = mainWindow;
 
-            List<Models.Book> books = Core.Book.GetList.Init(context).ToList();
-            List<Models.Client> clients = Core.Client.GetList.Init(context);
+            books = Core.Book.GetList.Init(context);
+            clients = Core.Client.GetList.Init(context);
             loans = Core.Loan.GetList.Init(context);
             if (loans.Count > 0) loans.ForEach(loan =>
             {
@@ -58,6 +60,42 @@ namespace Library.Windows
             dgClients.ItemsSource = clients;
         }
 
+        private void txtBookFilterKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) btnSearchBookClick(null, null);
+        }
+        private void btnSearchBookClick(object sender, RoutedEventArgs e)
+        {
+            if (txtBookFilter.Text == "")
+            {
+                dgBooks.ItemsSource = this.books;
+                return;
+            }
+
+            string search = txtBookFilter.Text.ToUpper();
+            List<Models.Book> books = this.books.Where(b =>
+                b.name.ToUpper().Contains(search) ||
+                b.author.ToUpper().Contains(search)).ToList();
+            dgBooks.ItemsSource = books;
+        }
+        private void txtClientFilterKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter) btnSearchClientClick(null, null);
+        }
+        private void btnSearchClientClick(object sender, RoutedEventArgs e)
+        {
+            if (txtClientFilter.Text == "")
+            {
+                dgClients.ItemsSource = this.clients;
+                return;
+            }
+
+            string search = txtClientFilter.Text.ToUpper();
+            List<Models.Client> clients = this.clients.Where(c =>
+                c.cardNumber.ToString().Contains(search) ||
+                c.name.ToUpper().Contains(search)).ToList();
+            dgClients.ItemsSource = clients;
+        }
         private void btnAddClick(object sender, RoutedEventArgs e)
         {
             Models.Book book = dgBooks.SelectedItem as Models.Book;
