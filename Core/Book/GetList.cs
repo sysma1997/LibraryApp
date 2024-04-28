@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,11 @@ namespace Library.Core.Book
     {
         public static List<Models.Book> Init(Models.DatabaseContext db)
         {
-            return db.Books.ToList();
+            return db.Books
+                .OrderBy(b => b.name)
+                .OrderBy(b => b.author)
+                .AsNoTracking()
+                .ToList();
         }
     }
 }

@@ -44,6 +44,9 @@ namespace Library
                 lblDefaultOption.Visibility = Visibility.Collapsed;
             gDashboard.Visibility = Visibility.Visible;
 
+            btnDelete.Visibility = Visibility.Collapsed;
+            btnEdit.Visibility = Visibility.Collapsed;
+
             if (view == MainWindowViews.BOOKS)
             {
                 lblSearch.Content = "Search Books:";
@@ -57,6 +60,7 @@ namespace Library
             else
             {
                 lblSearch.Content = "Search Loans:";
+                loadLoans();
             }
         }
         private void search()
@@ -64,7 +68,8 @@ namespace Library
             if (txtSearch.Text == "")
             {
                 if (view == MainWindowViews.BOOKS) loadBooks();
-                if (view == MainWindowViews.CLIENTS) loadClients();
+                else if (view == MainWindowViews.CLIENTS) loadClients();
+                else loadLoans();
 
                 return;
             }
@@ -93,34 +98,7 @@ namespace Library
             loans = null;
 
             books = Core.Book.GetList.Init(db);
-            dataGrid.Columns.Clear();
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Id", 
-                Binding = new Binding("id"), 
-                Visibility = Visibility.Collapsed
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Name", 
-                Binding = new Binding("name")
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Author",
-                Binding = new Binding("author")
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Number pages",
-                Binding = new Binding("numPages")
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Quantity",
-                Binding = new Binding("quantity"), 
-                Width = new DataGridLength(1, DataGridLengthUnitType.Star)
-            });
+            Core.Shared.DataGridModels.setItemBooks(dataGrid);
             dataGrid.ItemsSource = books;
         }
         public void loadClients()
@@ -129,30 +107,17 @@ namespace Library
             loans = null;
 
             clients = Core.Client.GetList.Init(db);
-            dataGrid.Columns.Clear();
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Id", 
-                Binding = new Binding("id"),
-                Visibility = Visibility.Collapsed
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Card phone", 
-                Binding = new Binding("cardNumber")
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Name",
-                Binding = new Binding("name")
-            });
-            dataGrid.Columns.Add(new DataGridTextColumn()
-            {
-                Header = "Phone", 
-                Binding = new Binding("phone"), 
-                Width = new DataGridLength(1, DataGridLengthUnitType.Star)
-            });
+            Core.Shared.DataGridModels.setItemClients(dataGrid);
             dataGrid.ItemsSource = clients;
+        }
+        public void loadLoans()
+        {
+            books = null;
+            clients = null;
+
+            loans = Core.Loan.GetList.Init(db);
+            Core.Shared.DataGridModels.setItemLoans(dataGrid);
+            dataGrid.ItemsSource = loans;
         }
 
         private void btnBooksShow(object sender, RoutedEventArgs e)
@@ -180,7 +145,16 @@ namespace Library
         {
             if (dataGrid.SelectedItem == null) return;
 
+            if (view == MainWindowViews.LOANS)
+            {
+                btnDelete.Visibility = Visibility.Visible;
+                btnDelete.Content = "Return";
+                btnEdit.Visibility = Visibility.Collapsed;
+                return;
+            }
+
             btnDelete.Visibility = Visibility.Visible;
+            btnDelete.Content = "Delete";
             btnEdit.Visibility = Visibility.Visible;
         }
         private void btnDeleteClick(object sender, RoutedEventArgs e)
@@ -205,6 +179,14 @@ namespace Library
                 title = "Client";
                 message = $"Remove this client {client.name}?";
             }
+            else
+            {
+                Models.Loan loan = dataGrid.SelectedItem as Models.Loan;
+
+                id = loan.id;
+                title = "Loan";
+                message = $"Did the client {loan.Client.name} return the '{loan.Book.name}' book?";
+            }
 
             MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;
@@ -218,6 +200,11 @@ namespace Library
             {
                 Core.Client.Delete.Init(db, id);
                 loadClients();
+            }
+            else
+            {
+                Core.Loan.Return.Init(db, id);
+                loadLoans();
             }
         }
         private void btnEditClick(object sender, RoutedEventArgs e)
@@ -239,6 +226,8 @@ namespace Library
                 new Windows.AddEditBook(db, this).Show();
             else if (view == MainWindowViews.CLIENTS)
                 new Windows.AddEditClient(db, this).Show();
+            else if (view == MainWindowViews.LOANS)
+                new Windows.AddLoan(db, this).Show();
         }
     }
 }

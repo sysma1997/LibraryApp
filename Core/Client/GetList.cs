@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,11 @@ namespace Library.Core.Client
     {
         public static List<Models.Client> Init(Models.DatabaseContext context)
         {
-            return context.Clients.ToList();
+            return context.Clients
+                .OrderBy(c => c.cardNumber)
+                .OrderBy(c => c.name)
+                .AsNoTracking()
+                .ToList();
         }
     }
 }
