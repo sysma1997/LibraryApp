@@ -92,7 +92,7 @@ namespace Library.Windows
 
             string search = txtClientFilter.Text.ToUpper();
             List<Models.Client> clients = this.clients.Where(c =>
-                c.cardNumber.ToString().Contains(search) ||
+                c.cardId.ToString().Contains(search) ||
                 c.name.ToUpper().Contains(search)).ToList();
             dgClients.ItemsSource = clients;
         }

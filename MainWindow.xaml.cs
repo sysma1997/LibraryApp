@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -85,7 +86,7 @@ namespace Library
             else if (view == MainWindowViews.CLIENTS)
             {
                 List<Models.Client> clients = this.clients.Where(c =>
-                    c.cardNumber.ToString().Contains(search) ||
+                    c.cardId.ToString().Contains(search) ||
                     c.name.ToUpper().Contains(search) ||
                     c.phone.Contains(search)).ToList();
                 dataGrid.ItemsSource = clients;

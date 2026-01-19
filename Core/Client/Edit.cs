@@ -19,7 +19,7 @@ namespace Library.Core.Client
                 return;
             }
 
-            client.cardNumber = clientEdit.cardNumber;
+            client.cardId = clientEdit.cardId;
             client.name = clientEdit.name;
             client.phone = clientEdit.phone;
 

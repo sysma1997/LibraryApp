@@ -35,7 +35,7 @@ namespace Library.Windows
 
             if (client != null)
             {
-                txtCardNumber.Text = client.cardNumber.ToString();
+                txtCardNumber.Text = client.cardId.ToString();
                 txtName.Text = client.name;
                 txtPhone.Text = client.phone;
 
@@ -87,7 +87,7 @@ namespace Library.Windows
             string phone = txtPhone.Text;
 
             Models.Client client = new Models.Client();
-            client.cardNumber = cardNumber;
+            client.cardId = cardNumber;
             client.name = name;
             client.phone = phone;
 

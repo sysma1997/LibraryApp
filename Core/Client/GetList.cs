@@ -12,7 +12,7 @@ namespace Library.Core.Client
         public static List<Models.Client> Init(Models.DatabaseContext context)
         {
             return context.Clients
-                .OrderBy(c => c.cardNumber)
+                .OrderBy(c => c.cardId)
                 .OrderBy(c => c.name)
                 .AsNoTracking()
                 .ToList();

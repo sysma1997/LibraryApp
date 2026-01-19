@@ -9,7 +9,7 @@ namespace Library.Models
     public class Client
     {
         public Guid id { get; set; }
-        public long cardNumber { get; set; }
+        public long cardId { get; set; }
         public string name { get; set; }
         public string phone { get; set; }
 
