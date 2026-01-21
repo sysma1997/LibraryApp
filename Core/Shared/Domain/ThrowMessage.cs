@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Shared.Domain
+namespace Library.Core.Shared.Domain
 {
-    class ThrowMessage
+    public class ThrowMessage
     {
         private StringBuilder message = new StringBuilder();
 

@@ -1,4 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Library.Core.Book.Domain;
+using Library.Core.Book.Infrastructure;
+using Library.Core.Client.Domain;
+using Library.Core.Client.Infrastructure;
+using Library.Core.Loan.Domain;
+using Library.Core.Loan.Infrastructure;
+using Library.Core.Shared.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,17 +31,24 @@ namespace Library
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly Models.DatabaseContext db = new Models.DatabaseContext();
+        private readonly Models.DatabaseContext context = new Models.DatabaseContext();
+        private readonly BookRepository bookRepository;
+        private readonly ClientRepository clientRepository;
+        private readonly LoanRepository loanRepository;
 
         private MainWindowViews view = MainWindowViews.BOOKS;
 
-        private List<Models.Book> books = null;
-        private List<Models.Client> clients = null;
-        private List<Models.Loan> loans = null;
+        private List<Book.Dto> books = null;
+        private List<Client.Dto> clients = null;
+        private List<Loan.Dto> loans = null;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            bookRepository = new BookEFCRepository(context);
+            clientRepository = new ClientEFCRepository(context);
+            loanRepository = new LoanEFCRepository(context);
         }
 
         private void setView(MainWindowViews view)
@@ -78,14 +92,14 @@ namespace Library
             string search = txtSearch.Text.ToUpper();
             if (view == MainWindowViews.BOOKS)
             {
-                List<Models.Book> books = this.books.Where(b =>
+                List<Book.Dto> books = this.books.Where(b =>
                     b.name.ToUpper().Contains(search) ||
                     b.author.ToUpper().Contains(search)).ToList();
                 dataGrid.ItemsSource = books;
             }
             else if (view == MainWindowViews.CLIENTS)
             {
-                List<Models.Client> clients = this.clients.Where(c =>
+                List<Client.Dto> clients = this.clients.Where(c =>
                     c.cardId.ToString().Contains(search) ||
                     c.name.ToUpper().Contains(search) ||
                     c.phone.Contains(search)).ToList();
@@ -93,9 +107,9 @@ namespace Library
             }
             else
             {
-                List<Models.Loan> loans = this.loans.Where(l =>
-                    l.Book.name.ToUpper().Contains(search) ||
-                    l.Client.name.ToUpper().Contains(search)).ToList();
+                List<Loan.Dto> loans = this.loans.Where(l =>
+                    l.book.name.ToUpper().Contains(search) ||
+                    l.client.name.ToUpper().Contains(search)).ToList();
                 dataGrid.ItemsSource = loans;
             }
         }
@@ -105,8 +119,9 @@ namespace Library
             clients = null;
             loans = null;
 
-            books = Core.Book.GetList.Init(db);
-            Core.Shared.DataGridModels.setItemBooks(dataGrid);
+            books = bookRepository.getList()
+                .Select(b => b.toDto()).ToList();
+            DataGridModels.setItemBooks(dataGrid);
             dataGrid.ItemsSource = books;
         }
         public void loadClients()
@@ -114,8 +129,9 @@ namespace Library
             books = null;
             loans = null;
 
-            clients = Core.Client.GetList.Init(db);
-            Core.Shared.DataGridModels.setItemClients(dataGrid);
+            clients = clientRepository.getList()
+                .Select(c => c.toDto()).ToList();
+            DataGridModels.setItemClients(dataGrid);
             dataGrid.ItemsSource = clients;
         }
         public void loadLoans()
@@ -123,8 +139,9 @@ namespace Library
             books = null;
             clients = null;
 
-            loans = Core.Loan.GetList.Init(db);
-            Core.Shared.DataGridModels.setItemLoans(dataGrid);
+            loans = loanRepository.getList()
+                .Select(l => l.toDto()).ToList();
+            DataGridModels.setItemLoans(dataGrid);
             dataGrid.ItemsSource = loans;
         }
 
@@ -173,7 +190,7 @@ namespace Library
 
             if (view == MainWindowViews.BOOKS)
             {
-                Models.Book book = dataGrid.SelectedItem as Models.Book;
+                Book.Dto book = dataGrid.SelectedItem as Book.Dto;
 
                 id = book.id;
                 title = "Book";
@@ -181,7 +198,7 @@ namespace Library
             }
             else if (view == MainWindowViews.CLIENTS)
             {
-                Models.Client client = dataGrid.SelectedItem as Models.Client;
+                Client.Dto client = dataGrid.SelectedItem as Client.Dto;
 
                 id = client.id;
                 title = "Client";
@@ -189,11 +206,11 @@ namespace Library
             }
             else
             {
-                Models.Loan loan = dataGrid.SelectedItem as Models.Loan;
+                Loan.Dto loan = dataGrid.SelectedItem as Loan.Dto;
 
                 id = loan.id;
                 title = "Loan";
-                message = $"Did the client {loan.Client.name} return the '{loan.Book.name}' book?";
+                message = $"Did the client {loan.client.name} return the '{loan.book.name}' book?";
             }
 
             MessageBoxResult result = MessageBox.Show(message, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -201,17 +218,17 @@ namespace Library
 
             if (view == MainWindowViews.BOOKS)
             {
-                Core.Book.Delete.Init(db, id);
+                bookRepository.delete(id);
                 loadBooks();
             }
             else if (view == MainWindowViews.CLIENTS)
             {
-                Core.Client.Delete.Init(db, id);
+                clientRepository.delete(id);
                 loadClients();
             }
             else
             {
-                Core.Loan.Return.Init(db, id);
+                loanRepository.returnBook(id);
                 loadLoans();
             }
         }
@@ -219,23 +236,23 @@ namespace Library
         {
             if (view == MainWindowViews.BOOKS)
             {
-                Models.Book book = dataGrid.SelectedItem as Models.Book;
-                new Windows.AddEditBook(db, this, book).Show();
+                Book book = dataGrid.SelectedItem as Book;
+                new Windows.AddEditBook(bookRepository, this, book).Show();
             }
             else if (view == MainWindowViews.CLIENTS)
             {
-                Models.Client client = dataGrid.SelectedItem as Models.Client;
-                new Windows.AddEditClient(db, this, client).Show();
+                Client client = dataGrid.SelectedItem as Client;
+                new Windows.AddEditClient(clientRepository, this, client).Show();
             }
         }
         private void btnAddClick(object sender, RoutedEventArgs e)
         {
             if (view == MainWindowViews.BOOKS)
-                new Windows.AddEditBook(db, this).Show();
+                new Windows.AddEditBook(bookRepository, this).Show();
             else if (view == MainWindowViews.CLIENTS)
-                new Windows.AddEditClient(db, this).Show();
+                new Windows.AddEditClient(clientRepository, this).Show();
             else if (view == MainWindowViews.LOANS)
-                new Windows.AddLoan(db, this).Show();
+                new Windows.AddLoan(bookRepository, clientRepository, loanRepository, this).Show();
         }
     }
 }

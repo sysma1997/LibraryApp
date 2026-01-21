@@ -14,8 +14,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <Label>Card number:</Label>
-            <TextBox x:Name="txtCardNumber" Margin="0,3,0,10" 
+            <Label>Card id:</Label>
+            <TextBox x:Name="txtCardId" Margin="0,3,0,10" 
                      InputScope="Number" />
             <Label>Name:</Label>
             <TextBox x:Name="txtName" Margin="0,3,0,10" />

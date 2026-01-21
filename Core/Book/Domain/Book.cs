@@ -1,4 +1,4 @@
-﻿using Library.V2.Shared.Domain;
+﻿using Library.Core.Shared.Domain;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Book.Domain
+namespace Library.Core.Book.Domain
 {
-    class Book
+    public class Book
     {
         public readonly Guid id;
         public readonly string name;
@@ -45,6 +45,10 @@ namespace Library.V2.Book.Domain
             this.quantity = quantity;
         }
 
+        public Book setId(Guid id)
+        {
+            return new Book(id, name, author, numPages, quantity);
+        }
         public Book setName(string name)
         {
             return new Book(id, name, author, numPages, quantity);
@@ -66,6 +70,18 @@ namespace Library.V2.Book.Domain
             return new Book(id, name, author, numPages, quantity);
         }
 
+        public Dto toDto()
+        {
+            return new Dto()
+            {
+                id = id,
+                name = name,
+                author = author,
+                numPages = numPages,
+                quantity = quantity
+            };
+        }
+
         public JObject toJson()
         {
             return new JObject()
@@ -80,6 +96,15 @@ namespace Library.V2.Book.Domain
         public override string ToString()
         {
             return toJson().ToString();
+        }
+
+        public class Dto
+        {
+            public Guid id { get; set; }
+            public string name { get; set; }
+            public string author { get; set; }
+            public int numPages { get; set; }
+            public int quantity { get; set; }
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Client.Domain
+namespace Library.Core.Client.Domain
 {
-    interface ClientRepository
+    public interface ClientRepository
     {
         void add(Client client);
         void edit(Client client);

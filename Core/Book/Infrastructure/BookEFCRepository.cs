@@ -1,5 +1,5 @@
 ﻿using Library.Models;
-using Library.V2.Book.Domain;
+using Library.Core.Book.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Book.Infrastructure
+namespace Library.Core.Book.Infrastructure
 {
-    class BookEFCRepository : BookRepository
+    public class BookEFCRepository : BookRepository
     {
         private Models.DatabaseContext context;
 
@@ -20,6 +20,13 @@ namespace Library.V2.Book.Infrastructure
 
         public void add(Domain.Book book)
         {
+            Models.Book exists = context.Books.Where(b => 
+                b.name.ToUpper() == book.name.ToUpper() && 
+                b.author.ToUpper() == book.author.ToUpper())
+                .FirstOrDefault();
+            if (exists != null)
+                throw new Exception("Book already exists.");
+
             Models.Book mBook = new Models.Book();
             mBook.id = book.id;
             mBook.name = book.name;
@@ -32,6 +39,15 @@ namespace Library.V2.Book.Infrastructure
         }
         public void edit(Domain.Book book)
         {
+            Models.Book exists = context.Books.Where(b =>
+                b.id != book.id && 
+                b.name.ToUpper() == book.name.ToUpper() &&
+                b.author.ToUpper() == book.author.ToUpper())
+                .FirstOrDefault();
+            if (exists != null)
+                throw new Exception("Cannot update this book because there is already another " + 
+                    "one with this name and author.");
+
             Models.Book? mBook = context.Books.Where(b => 
                 b.id == book.id).FirstOrDefault();
             if (mBook == null)

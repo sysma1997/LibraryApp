@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Library.Core.Book.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,17 +20,17 @@ namespace Library.Windows
     /// </summary>
     public partial class AddEditBook : Window
     {
-        private Models.DatabaseContext db;
+        private readonly BookRepository bookRepository;
         private MainWindow mainWindow;
-        private Models.Book book;
+        private Book book;
 
-        public AddEditBook(Models.DatabaseContext db, 
+        public AddEditBook(BookRepository bookRepository, 
             MainWindow mainWindow, 
-            Models.Book book = null)
+            Book book = null)
         {
             InitializeComponent();
 
-            this.db = db;
+            this.bookRepository = bookRepository;
             this.mainWindow = mainWindow;
             this.book = book;
 
@@ -96,18 +97,23 @@ namespace Library.Windows
                 return;
             }
 
-            Models.Book book = new Models.Book();
-            book.name = name;
-            book.author = author;
-            book.numPages = numPages;
-            book.quantity = quantity;
+            Book book = new Book(Guid.NewGuid(), 
+                name, author, 
+                numPages, quantity);
             
-            if (this.book == null)
-                Core.Book.Add.Init(db, book);
-            else
+            try
             {
-                book.id = this.book.id;
-                Core.Book.Edit.Init(db, book);
+                if (this.book == null) 
+                    bookRepository.add(book);
+                else
+                {
+                    book = book.setId(this.book.id);
+                    bookRepository.edit(book);
+                }
+            } catch (Exception ex)
+            {
+                setMessage(ex.Message);
+                return;
             }
 
             mainWindow.loadBooks();

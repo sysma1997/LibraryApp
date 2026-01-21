@@ -1,4 +1,4 @@
-﻿using Library.V2.Shared.Domain;
+﻿using Library.Core.Shared.Domain;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Loan.Domain
+namespace Library.Core.Loan.Domain
 {
-    class Loan
+    public class Loan
     {
         public readonly Guid id;
         public readonly Guid idBook;
@@ -50,6 +50,12 @@ namespace Library.V2.Loan.Domain
             this.client = client;
         }
 
+        public Loan setId(Guid id)
+        {
+            return new Loan(id, idBook, idClient,
+                date, deadline,
+                book, client);
+        }
         public Loan setDate(DateTime date)
         {
             return new Loan(id, idBook, idClient, 
@@ -75,6 +81,21 @@ namespace Library.V2.Loan.Domain
                 book, client);
         }
 
+        public Dto toDto()
+        {
+            return new Dto()
+            {
+                id = id,
+                idBook = idBook,
+                idClient = idClient,
+                date = date,
+                deadline = deadline,
+                
+                book = book.toDto(),
+                client = client.toDto()
+            };
+        }
+
         public JObject toJson()
         {
             JObject json = new JObject()
@@ -83,17 +104,29 @@ namespace Library.V2.Loan.Domain
                 ["idBook"] = idBook,
                 ["idClient"] = idClient,
                 ["date"] = date,
-                ["deadline"] = deadline
-            };
+                ["deadline"] = deadline,
 
-            if (book != null) json["book"] = book.toJson();
-            if (client != null) json["client"] = client.toJson();
+                ["book"] = book.toJson(),
+                ["client"] = client.toJson()
+            };
 
             return json;
         }
         public override string ToString()
         {
             return toJson().ToString();
+        }
+
+        public class Dto
+        {
+            public Guid id { get; set; }
+            public Guid idBook { get; set; }
+            public Guid idClient { get; set; }
+            public DateTime date { get; set; } 
+            public DateTime deadline { get; set; }
+
+            public Book.Domain.Book.Dto book { get; set; }
+            public Client.Domain.Client.Dto client { get; set; }
         }
     }
 }

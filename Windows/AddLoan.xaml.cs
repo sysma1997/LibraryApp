@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Library.Core.Book.Domain;
+using Library.Core.Client.Domain;
+using Library.Core.Loan.Domain;
+using Library.Core.Shared.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,23 +24,30 @@ namespace Library.Windows
     /// </summary>
     public partial class AddLoan : Window
     {
-        private Models.DatabaseContext context;
+        private readonly BookRepository bookRepository;
+        private readonly ClientRepository clientRepository;
+        private readonly LoanRepository loanRepository;
         private MainWindow mainWindow;
 
-        private List<Models.Book> books;
-        private List<Models.Client> clients;
-        private List<Models.Loan> loans;
+        private List<Book.Dto> books;
+        private List<Client.Dto> clients;
+        private List<Loan.Dto> loans;
 
-        public AddLoan(Models.DatabaseContext context, MainWindow mainWindow)
+        public AddLoan(BookRepository bookRepository, 
+            ClientRepository clientRepository, 
+            LoanRepository loanRepository, 
+            MainWindow mainWindow)
         {
             InitializeComponent();
 
-            this.context = context;
+            this.bookRepository = bookRepository;
+            this.clientRepository = clientRepository;
+            this.loanRepository = loanRepository;
             this.mainWindow = mainWindow;
 
-            books = Core.Book.GetList.Init(context);
-            clients = Core.Client.GetList.Init(context);
-            loans = Core.Loan.GetList.Init(context);
+            books = bookRepository.getList().Select(b => b.toDto()).ToList();
+            clients = clientRepository.getList().Select(c => c.toDto()).ToList();
+            loans = loanRepository.getList().Select(l => l.toDto()).ToList();
             if (loans.Count > 0) loans.ForEach(loan =>
             {
                 for (int i = 0; i < books.Count; i++)
@@ -54,9 +65,9 @@ namespace Library.Windows
                 }
             });
 
-            Core.Shared.DataGridModels.setItemBooks(dgBooks);
+            DataGridModels.setItemBooks(dgBooks);
             dgBooks.ItemsSource = books;
-            Core.Shared.DataGridModels.setItemClients(dgClients);
+            DataGridModels.setItemClients(dgClients);
             dgClients.ItemsSource = clients;
         }
 
@@ -73,7 +84,7 @@ namespace Library.Windows
             }
 
             string search = txtBookFilter.Text.ToUpper();
-            List<Models.Book> books = this.books.Where(b =>
+            List<Book.Dto> books = this.books.Where(b =>
                 b.name.ToUpper().Contains(search) ||
                 b.author.ToUpper().Contains(search)).ToList();
             dgBooks.ItemsSource = books;
@@ -91,15 +102,15 @@ namespace Library.Windows
             }
 
             string search = txtClientFilter.Text.ToUpper();
-            List<Models.Client> clients = this.clients.Where(c =>
+            List<Client.Dto> clients = this.clients.Where(c =>
                 c.cardId.ToString().Contains(search) ||
                 c.name.ToUpper().Contains(search)).ToList();
             dgClients.ItemsSource = clients;
         }
         private void btnAddClick(object sender, RoutedEventArgs e)
         {
-            Models.Book book = dgBooks.SelectedItem as Models.Book;
-            Models.Client client = dgClients.SelectedItem as Models.Client;
+            Book.Dto book = dgBooks.SelectedItem as Book.Dto;
+            Client.Dto client = dgClients.SelectedItem as Client.Dto;
             if (book == null || 
                 client == null)
             {
@@ -119,7 +130,7 @@ namespace Library.Windows
             DateTime deadline = dpDeadline.SelectedDate.GetValueOrDefault();
             if (loans.Count > 0)
             {
-                foreach (Models.Loan _loan in loans)
+                foreach (Loan.Dto _loan in loans)
                 {
                     if (_loan.idBook == book.id &&
                         _loan.idClient == client.id)
@@ -135,15 +146,21 @@ namespace Library.Windows
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result != MessageBoxResult.Yes) return;
 
-            Models.Loan loan = new Models.Loan();
-            loan.idBook = book.id;
-            loan.idClient = client.id;
-            loan.date = DateTime.Now.Date;
-            loan.deadline = deadline.Date;
+            Book cBook = new Book(book.id, book.name, book.author, book.numPages, book.quantity);
+            Client cClient = new Client(client.id, client.cardId, client.name, client.phone);
+            Loan loan = new Loan(Guid.NewGuid(), book.id, client.id, 
+                DateTime.Now.Date, deadline.Date, 
+                cBook, cClient);
 
-            Core.Loan.Add.Init(context, loan);
-            this.Close();
-            mainWindow.loadLoans();
+            try
+            {
+                loanRepository.add(loan);
+                this.Close();
+                mainWindow.loadLoans();
+            } catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Warning");
+            }
         }
     }
 }

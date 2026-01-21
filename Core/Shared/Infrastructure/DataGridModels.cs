@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 
-namespace Library.Core.Shared
+namespace Library.Core.Shared.Infrastructure
 {
     public static class DataGridModels
     {
@@ -53,8 +53,8 @@ namespace Library.Core.Shared
             });
             dataGrid.Columns.Add(new DataGridTextColumn()
             {
-                Header = "Card phone",
-                Binding = new Binding("cardNumber")
+                Header = "Card ID",
+                Binding = new Binding("cardId")
             });
             dataGrid.Columns.Add(new DataGridTextColumn()
             {
@@ -80,12 +80,12 @@ namespace Library.Core.Shared
             dataGrid.Columns.Add(new DataGridTextColumn()
             {
                 Header = "Book",
-                Binding = new Binding("Book.name")
+                Binding = new Binding("book.name")
             });
             dataGrid.Columns.Add(new DataGridTextColumn()
             {
                 Header = "Client",
-                Binding = new Binding("Client.name")
+                Binding = new Binding("client.name")
             });
             dataGrid.Columns.Add(new DataGridTextColumn()
             {

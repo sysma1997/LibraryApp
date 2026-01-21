@@ -1,4 +1,4 @@
-﻿using Library.V2.Shared.Domain;
+﻿using Library.Core.Shared.Domain;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -6,22 +6,22 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Client.Domain
+namespace Library.Core.Client.Domain
 {
-    class Client
+    public class Client
     {
         public readonly Guid id;
         public readonly long cardId;
         public readonly string name;
         public readonly string phone;
 
-        public Client(Guid id, 
-            long cardId, string name, 
+        public Client(Guid id,
+            long cardId, string name,
             string phone)
         {
-            if (id == Guid.Empty || 
-                cardId <= 0 || 
-                (name == null || name == "") || 
+            if (id == Guid.Empty ||
+                cardId <= 0 ||
+                (name == null || name == "") ||
                 (phone == null || phone == ""))
             {
                 ThrowMessage message = new ThrowMessage();
@@ -40,6 +40,10 @@ namespace Library.V2.Client.Domain
             this.phone = phone;
         }
 
+        public Client setId(Guid id)
+        {
+            return new Client(id, cardId, name, phone);
+        }
         public Client setCardId(long carId)
         {
             return new Client(id, cardId, name, phone);
@@ -57,6 +61,17 @@ namespace Library.V2.Client.Domain
             return new Client(id, cardId, name, phone);
         }
 
+        public Dto toDto()
+        {
+            return new Dto()
+            {
+                id = id,
+                cardId = cardId,
+                name = name,
+                phone = phone
+            };
+        }
+
         public JObject toJson()
         {
             return new JObject()
@@ -70,6 +85,14 @@ namespace Library.V2.Client.Domain
         public override string ToString()
         {
             return toJson().ToString();
+        }
+
+        public class Dto
+        {
+            public Guid id { get; set; }
+            public long cardId { get; set; }
+            public string name { get; set; }
+            public string phone { get; set; }
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Book.Domain
+namespace Library.Core.Book.Domain
 {
-    interface BookRepository
+    public interface BookRepository
     {
         void add(Book book);
         void edit(Book book);

@@ -1,5 +1,5 @@
 ﻿using Library.Models;
-using Library.V2.Client.Domain;
+using Library.Core.Client.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Client.Infrastructure
+namespace Library.Core.Client.Infrastructure
 {
-    class ClientEFCRepository : ClientRepository
+    public class ClientEFCRepository : ClientRepository
     {
         private DatabaseContext context;
 
@@ -20,6 +20,11 @@ namespace Library.V2.Client.Infrastructure
 
         public void add(Domain.Client client)
         {
+            Models.Client exists = context.Clients.Where(c => 
+               c.cardId == client.cardId).FirstOrDefault();
+            if (exists != null)
+                throw new Exception("Client with same card ID already exists.");
+
             Models.Client mClient = new Models.Client();
             mClient.id = client.id;
             mClient.cardId = client.cardId;
@@ -27,6 +32,7 @@ namespace Library.V2.Client.Infrastructure
             mClient.phone = client.phone;
 
             context.Clients.Add(mClient);
+            context.SaveChanges();
         }
         public void edit(Domain.Client client)
         {

@@ -1,5 +1,5 @@
 ﻿using Library.Models;
-using Library.V2.Loan.Domain;
+using Library.Core.Loan.Domain;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Loan.Infrastructure
+namespace Library.Core.Loan.Infrastructure
 {
-    class LoanEFCRepository : LoanRepository
+    public class LoanEFCRepository : LoanRepository
     {
         private DatabaseContext context;
 

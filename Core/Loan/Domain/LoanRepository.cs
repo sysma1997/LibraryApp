@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.V2.Loan.Domain
+namespace Library.Core.Loan.Domain
 {
-    interface LoanRepository
+    public interface LoanRepository
     {
         void add(Loan loan);
         void returnBook(Guid id);

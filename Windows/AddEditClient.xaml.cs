@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Library.Core.Client.Domain;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,23 +20,23 @@ namespace Library.Windows
     /// </summary>
     public partial class AddEditClient : Window
     {
-        private Models.DatabaseContext context;
+        private readonly ClientRepository clientRepository;
         private MainWindow mainWindow;
-        private Models.Client client;
+        private Client client;
 
-        public AddEditClient(Models.DatabaseContext context, 
+        public AddEditClient(ClientRepository clientRepository, 
             MainWindow mainWindow, 
-            Models.Client client = null)
+            Client client = null)
         {
             InitializeComponent();
 
-            this.context = context;
+            this.clientRepository = clientRepository;
             this.mainWindow = mainWindow;
             this.client = client;
 
             if (client != null)
             {
-                txtCardNumber.Text = client.cardId.ToString();
+                txtCardId.Text = client.cardId.ToString();
                 txtName.Text = client.name;
                 txtPhone.Text = client.phone;
 
@@ -56,14 +57,14 @@ namespace Library.Windows
 
         private void btnAddClick(object sender, RoutedEventArgs e)
         {
-            if (txtCardNumber.Text == "" || 
+            if (txtCardId.Text == "" || 
                 txtName.Text == "" || 
                 txtPhone.Text == "")
             {
                 string message = "";
                 int comma = 0;
 
-                if (txtCardNumber.Text == "")
+                if (txtCardId.Text == "")
                 {
                     message += "Card number";
                     comma++;
@@ -76,8 +77,8 @@ namespace Library.Windows
             }
             clearMessage();
 
-            long cardNumber = 0;
-            try { cardNumber = Convert.ToInt64(txtCardNumber.Text); }
+            long cardId = 0;
+            try { cardId = Convert.ToInt64(txtCardId.Text); }
             catch 
             {
                 setMessage("Card number is not valid value");
@@ -86,17 +87,23 @@ namespace Library.Windows
             string name = txtName.Text;
             string phone = txtPhone.Text;
 
-            Models.Client client = new Models.Client();
-            client.cardId = cardNumber;
-            client.name = name;
-            client.phone = phone;
+            Client client = new Client(Guid.NewGuid(), 
+                cardId, name, 
+                phone);
 
-            if (this.client == null)
-                Core.Client.Add.Init(context, client);
-            else
+            try
             {
-                client.id = this.client.id;
-                Core.Client.Edit.Init(context, client);
+                if (this.client == null) 
+                    clientRepository.add(client);
+                else
+                {
+                    client = client.setId(this.client.id);
+                    clientRepository.edit(client);
+                }
+            } catch (Exception ex)
+            {
+                setMessage(ex.Message);
+                return;
             }
 
             mainWindow.loadClients();
